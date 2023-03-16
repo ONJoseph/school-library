@@ -1,3 +1,4 @@
+require_relative 'rental'
 require_relative 'nameable'
 
 class Person < Nameable
@@ -21,7 +22,7 @@ class Person < Nameable
     @name
   end
 
-  def add_rental(book, date)
+  def add_rental(book, date, _new_rental)
     rental = Rental.new(self, book, date)
     @rentals.push(rental) unless @rentals.include?(rental)
     rental
