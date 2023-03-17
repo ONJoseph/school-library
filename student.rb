@@ -18,4 +18,3 @@ class Student < Person
     puts '(ツ)_/¯'
   end
 end
-
