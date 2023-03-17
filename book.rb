@@ -1,5 +1,6 @@
-require_relative 'rentals'
+require './rental'
 
+# class Book
 class Book
   attr_accessor :title, :author, :rentals
 
@@ -9,9 +10,7 @@ class Book
     @rentals = []
   end
 
-  def add_rental(person, date, _new_rental)
-    rental = Rental.new(person, self, date)
-    @rentals.push(rental) unless @rentals.include?(rental)
-    rental
+  def add_rental(person, date)
+    Rental.new(self, person, date)
   end
 end
