@@ -1,63 +1,103 @@
-require './book'
-require './student'
-require './teacher'
+require './arcade_main'
+require './main_helper'
 
-class App
-  attr_accessor :books, :people
+# Class App
+class App < ArcadeMain
+  include MainHelper
 
-  def initialize
-    @books = []
-    @people = []
-  end
+  def create_person
+    print 'Do you want to create a student (1) or a teacher (2)? [Input the number]: '
+    choice = gets.chomp.to_i
 
-  def list_books(with_index)
-    @books.each_with_index do |book, i|
-      indexing = with_index ? "#{i + 1}) " : ''
-      puts "#{indexing}title: #{book.title}, author: #{book.author}"
+    choice > 2 && error(:create_person)
+
+    print 'Age: '
+    age = gets.chomp.to_i
+
+    print 'Name: '
+    name = gets.chomp
+
+    if choice == 1
+      print 'Has parent Permission? (y/n): '
+      pm = gets.chomp
+
+      add_person(1, age, name, pm == 'y')
+
+    else
+      print 'Specialization: '
+      spec = gets.chomp
+
+      add_person(2, age, name, spec)
     end
+
+    puts 'Person created Successfully!'
   end
 
-  def add_book(title, author)
-    @books << Book.new(title, author)
+  def create_book
+    print 'Title: '
+    title = gets.chomp
+
+    print 'Author: '
+    author = gets.chomp
+
+    add_book(title, author)
+
+    puts 'Book created Successfully!'
   end
 
-  def add_student(age, name, parent_permission)
-    @people << { type: 'Student', data: Student.new(age, name, parent_permission) }
+  def create_rental
+    puts 'Select a book from the following list by number:'
+    list_books(true)
+    book_id = gets.chomp.to_i
+    (book_id < 1 || book_id > books.length) && error(:create_rental)
+
+    puts ' Select a person from the following list by number'
+    list_people(true)
+    person_id = gets.chomp.to_i
+    (person_id < 1 || person_id > people.length) && error(:create_rental)
+
+    print 'Date: '
+    date = gets.chomp
+
+    generate_rental(book_id - 1, person_id - 1, date)
+
+    puts 'Rental created Successfully!'
   end
 
-  def add_teacher(age, name, specialization)
-    @people << { type: 'Teacher', data: Teacher.new(age, name, specialization) }
+  def list_rentals
+    list_people(false)
+    print 'ID of Person: '
+    id = gets.chomp.to_i
+
+    list_person_rentals(id)
   end
 
-  def add_person(type, age, name, third_param)
-    case type
+  def run_choices(input)
+    case input
     when 1
-      add_student(age, name, third_param)
+      list_books(false)
     when 2
-      add_teacher(age, name, third_param)
+      list_people(false)
+    when 3
+      create_person
+    when 4
+      create_book
+    when 5
+      create_rental
+    when 6
+      list_rentals
     end
   end
 
-  def list_people(with_index)
-    @people.each_with_index do |person, i|
-      indexing = with_index ? "#{i + 1})" : ''
-      id = with_index ? '' : " id: #{person[:data].id},"
-      puts "#{indexing}[#{person[:type]}]#{id} age: #{person[:data].age}, name: #{person[:data].name}"
-    end
-  end
+  def choices
+    list_options
+    input = gets.chomp.to_i
 
-  def create_rental(book_index, person_index, date)
-    @books[book_index].add_rental(@people[person_index][:data], date)
-  end
-
-  def find_person(person_id)
-    @people.find { |person| person[:data].id == person_id }
-  end
-
-  def list_person_rentals(id)
-    person = find_person(id)
-    person && person[:data].rentals.each do |rental|
-      puts "Date: #{rental.date}, Book: #{rental.book.title} by #{rental.book.author}"
+    if input > 6
+      puts 'Thank you for using this App!'
+      exit
+    else
+      run_choices(input)
     end
   end
 end
