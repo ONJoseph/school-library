@@ -1,4 +1,4 @@
-require './person'
+require_relative './person'
 
 # Class Teacher inhereting from Person Class
 class Teacher < Person

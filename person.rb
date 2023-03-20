@@ -1,5 +1,5 @@
-require './nameable'
-require './book'
+require_relative './nameable'
+require_relative './book'
 
 # Class Person
 class Person < Nameable

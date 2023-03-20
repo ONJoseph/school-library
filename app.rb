@@ -1,5 +1,5 @@
-require './arcade_main'
-require './main_helper'
+require_relative './arcade_main'
+require_relative './main_helper'
 
 # Class App
 class App < ArcadeMain
