@@ -1,5 +1,4 @@
 # Module PersonRentals
-
 module PersonRentals
   def find_person(person_id, arr)
     arr.find { |person| person[:data].id == person_id }
