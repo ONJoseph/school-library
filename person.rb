@@ -1,8 +1,10 @@
-require_relative './nameable'
-require_relative './book'
+require './nameable'
+require './book'
+require './modules/rental'
 
 # Class Person
 class Person < Nameable
+  include PreserveRental
   attr_accessor :name, :age, :rentals
   attr_reader :id
 

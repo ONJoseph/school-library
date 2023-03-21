@@ -1,9 +1,13 @@
-require_relative './arcade_main'
-require_relative './main_helper'
+require './arcade_main'
+require './main_helper'
+require_relative 'modules/book'
+require_relative 'modules/people'
 
 # Class App
 class App < ArcadeMain
   include MainHelper
+  include PreserveBook
+  include PreservePeople
 
   def create_person
     print 'Do you want to create a student (1) or a teacher (2)? [Input the number]: '

@@ -1,9 +1,12 @@
+require_relative 'modules/people'
+
 # Class Create Person
 class CreatePerson
+  include PreservePeople
   attr_accessor :people
 
   def initialize
-    @people = []
+    @people = fetch_poeple
   end
 
   def add_student(age, name, parent_permession)
