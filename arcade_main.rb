@@ -6,7 +6,6 @@ require_relative 'person_rentals'
 require_relative './modules/book'
 require './modules/rental'
 
-
 # class ArcadeMain
 class ArcadeMain
   include PersonRentals
