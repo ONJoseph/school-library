@@ -1,107 +1,140 @@
-require './arcade_main'
-require './main_helper'
-require_relative 'modules/book'
-require_relative 'modules/people'
+require './book'
+require './teacher'
+require './rental'
+require './student'
+require './database'
+require './loaddata'
+require 'json'
 
-# Class App
-class App < ArcadeMain
-  include MainHelper
-  include PreserveBook
-  include PreservePeople
-
-  def create_person
-    print 'Do you want to create a student (1) or a teacher (2)? [Input the number]: '
-    choice = gets.chomp.to_i
-
-    choice > 2 && error(:create_person)
-
-    print 'Age: '
-    age = gets.chomp.to_i
-
-    print 'Name: '
-    name = gets.chomp
-
-    if choice == 1
-      print 'Has parent Permission? (y/n): '
-      pm = gets.chomp
-
-      add_person(1, age, name, pm == 'y')
-
-    else
-      print 'Specialization: '
-      spec = gets.chomp
-
-      add_person(2, age, name, spec)
-    end
-
-    puts 'Person created Successfully!'
+class App
+  include Database
+  include Loaddata
+  def initialize
+    @books = load_book
+    @people = load_person
+    @rentals = load_rentals
   end
 
-  def create_book
-    print 'Title: '
-    title = gets.chomp
+  def all_books
+    @books = load_book
+    if @books.empty?
+      puts "There are no books created yet, Add some books to see them here :( \n\n"
+    else
+      @books.each { |bk| puts "\n Title: #{bk['title']} by #{bk['author']} \n \n" }
+    end
+  end
 
-    print 'Author: '
-    author = gets.chomp
+  def all_people
+    @people = load_person
+    if @people.empty?
+      puts "There are no persons created yet, Add users to see them here :( \n\n"
+    else
+      @people.each do |peeps|
+        puts "\n [#{peeps['type']}]: Name: #{peeps['name']}, Age: #{peeps['age']} years old specialized in #{peeps['specialization']} \n\n"
+      end
+    end
+  end
 
-    add_book(title, author)
+  def create_person()
+    p 'Please enter an option, 1 for Teacher, 2 for Student'
+    res = gets.chomp
+    case res
+    when '1'
+      puts 'Enter Name of Teacher'
+      name = gets.chomp
+      puts 'Enter teacher\'s Age'
+      age = gets.chomp
+      puts 'What\'s teacher\'s specialization?'
+      spec = gets.chomp
+      new_person = Teacher.new(spec, name, age)
+      @people << {
+        id: new_person.id,
+        type: new_person.class,
+        name: new_person.name,
+        age: new_person.age,
+        rentals: new_person.rentals,
+        specialization: new_person.specialization
+      }
+      puts "\n User #{name} created successfully \n\n"
+      save_people(@people)
+    when '2'
+      puts 'Enter Student Name'
+      name = gets.chomp
+      puts 'What\'s your age?'
+      age = gets.chomp
+      puts 'What Class (Classes incluse 3b, 4a, 6c)?'
+      classes = gets.chomp
+      permission?
+      new_student = Student.new(classes, name, age)
+      @people << {
+        id: new_student.id,
+        type: new_student.class,
+        name: new_student.name,
+        age: new_student.age
+      }
+      puts "\n Student #{name} aged #{age} created successfully! \n\n"
+      save_people(@people)
+    end
+  end
 
-    puts 'Book created Successfully!'
+  def create_book(title, author)
+    new_book = Book.new(title, author)
+    @books << { title: new_book.title, author: new_book.author }
+    puts "\n Book #{title} by #{author} created successfully! \n\n"
+    add_to_json(@books)
+  end
+
+  def permission?
+    puts 'Do you have Parent\'s Permission (Y,y/N,n)?'
+    permit = gets.chomp
+    case permit
+    when permit == 'y', 'Y'
+      true
+    when permit == 'n', 'N'
+      false
+    else
+      puts 'Invalide entry, Please try again'
+      permission?
+    end
   end
 
   def create_rental
-    puts 'Select a book from the following list by number:'
-    list_books(true)
-    book_id = gets.chomp.to_i
-    (book_id < 1 || book_id > books.length) && error(:create_rental)
-
-    puts ' Select a person from the following list by number'
-    list_people(true)
-    person_id = gets.chomp.to_i
-    (person_id < 1 || person_id > people.length) && error(:create_rental)
-
-    print 'Date: '
+    puts "Here are the available books, Select by Index number \n"
+    @books.each_with_index { |bk, i| puts "\n #{i + 1}. #{bk['title']} by #{bk['author']}  \n\n" }
+    index = gets.chomp.to_i
+    puts 'Who is renting this book?'
+    @people.each_with_index { |bk, i| puts "#{i + 1} #{bk['name']} aged #{bk['age']}" }
+    person = gets.chomp.to_i
+    puts 'Enter a date'
+    puts @books[index - 1]
     date = gets.chomp
-
-    generate_rental(book_id - 1, person_id - 1, date)
-
-    puts 'Rental created Successfully!'
+    new_rental = Rental.new(date, @books[index - 1], @people[person - 1])
+    arr = []
+    @rentals << {
+      date: new_rental.date,
+      person_id: new_rental.person['id'],
+      person_name: new_rental.person['name'],
+      title: new_rental.book['title'],
+      author: new_rental.book['author'],
+      rentals: arr << new_rental.person['rentals']
+    }
+    puts "\n Rental Created successfully! \n\n"
+    save_rentals(@rentals)
   end
 
-  def list_rentals
-    list_people(false)
-    print 'ID of Person: '
-    id = gets.chomp.to_i
-
-    list_person_rentals(id)
-  end
-
-  def run_choices(input)
-    case input
-    when 1
-      list_books(false)
-    when 2
-      list_people(false)
-    when 3
-      create_person
-    when 4
-      create_book
-    when 5
-      create_rental
-    when 6
-      list_rentals
+  def all_rentals
+    @rentals = load_rentals
+    puts "Below are the rentals Records, Insert an ID to filter \n"
+    @rentals.each_with_index { |rent, i| puts "\n #{i}. #{rent['title']} written by #{rent['author']} \n \n" }
+    puts "Here are all users information \n"
+    @people.each_with_index do |users, i|
+      puts "\n #{i + 1}. #{users['name']} aged #{users['age']} with ID: #{users['id']} \n\n"
     end
-  end
 
-  def choices
-    list_options
-    input = gets.chomp.to_i
-
-    if input > 6
-      puts 'Thank you for using this App!'
-      exit
-    else
-      run_choices(input)
+    puts 'Enter an ID to see all user\'s rentals'
+    id = gets.chomp.to_i
+    @rentals.select do |user|
+      puts "\n #{user['date']} #{user['title']} written by #{user['author']} \n\n" if user['person_id'] == id
     end
   end
 end
