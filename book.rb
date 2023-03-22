@@ -1,10 +1,6 @@
-require './rental'
-require './modules/rental'
-
-# class Book
 class Book
-  include PreserveRental
-  attr_accessor :title, :author, :rentals
+  attr_accessor :title, :author
+  attr_reader :rentals
 
   def initialize(title, author)
     @title = title
@@ -12,7 +8,8 @@ class Book
     @rentals = []
   end
 
-  def add_rental(person, date)
-    Rental.new(self, person, date)
+  def add_rentals(rental)
+    @rental.push(rental)
+    rental.book = self
   end
 end

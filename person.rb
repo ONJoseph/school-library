@@ -1,37 +1,37 @@
 require './nameable'
-require './book'
-require './modules/rental'
 
-# Class Person
 class Person < Nameable
-  include PreserveRental
-  attr_accessor :name, :age, :rentals
-  attr_reader :id
+  attr_reader :id, :rentals
+  attr_accessor :name, :age
 
-  def initialize(age, name, parent_permission)
+  def initialize(name, age, parent_permission: true)
     super()
-    @id = Random.rand(1..9999)
-    @name = name
+    @id = Random.rand(1...1000)
     @age = age
+    @name = name
     @parent_permission = parent_permission
     @rentals = []
   end
 
-  def add_rental(book, date)
-    Rental.new(book, self, date)
+  def can_use_services?
+    true if is_of_age? or @parent_permission
   end
 
   def correct_name
     @name
   end
 
-  def can_use_services?
-    of_age? || @parent_permission
-  end
-
   private
 
   def of_age?
-    @age >= 18
+    true if age >= 18
+  end
+
+  def add_rentals(rental)
+    @rentals.push(rental)
+    rental.person = self
   end
 end
+
+person = Person.new(22, 'maximilianus')
+person.correct_name
