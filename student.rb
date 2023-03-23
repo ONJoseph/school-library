@@ -1,20 +1,19 @@
-require_relative './person'
+require './person'
 
-# Class Student inhereting from Person Class
 class Student < Person
-  attr_accessor :classroom
+  attr_reader :classroom
 
-  def initialize(age, name, parent_permession, classroom = nil)
-    super(age, name, parent_permession)
+  def initialize(classroom, name, age)
+    super(name, age)
     @classroom = classroom
-  end
-
-  def modify_classroom(classroom)
-    @classroom = classroom
-    classroom.add_student(self) unless classroom.students.include?(self)
   end
 
   def play_hooky
-    puts '(ツ)_/¯'
+    '¯(ツ)/¯'
+  end
+
+  def classrooms(classes)
+    @classroom = classes
+    classes.students.push(self) unless classes.students.include(self)
   end
 end

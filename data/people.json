@@ -1,0 +1,38 @@
+[
+  {
+    "id": 53,
+    "type": "Teacher",
+    "name": "Gordon Martin",
+    "age": "38",
+    "rentals": [
+
+    ],
+    "specialization": "Sciences"
+  },
+  {
+    "id": 605,
+    "type": "Teacher",
+    "name": "Hilda",
+    "age": "40",
+    "rentals": [
+
+    ],
+    "specialization": "Fiction"
+  },
+  {
+    "id": 899,
+    "type": "Student",
+    "name": "Gabby",
+    "age": "12"
+  },
+  {
+    "id": 770,
+    "type": "Teacher",
+    "name": "Felix",
+    "age": "23",
+    "rentals": [
+
+    ],
+    "specialization": "Science"
+  }
+]
