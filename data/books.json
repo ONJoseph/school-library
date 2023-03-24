@@ -9,6 +9,11 @@
   },
   {
     "title": "A boy soldier!",
-    "author": "Alexander"
+    "author": "Alexander",
+    "rentals": "#<Rental:0x000001ab9c57ee48>"
+  },
+  {
+    "title": "The god's are not to blame!",
+    "author": "Achebe"
   }
 ]
